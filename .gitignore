@@ -1,0 +1,5 @@
+*.pyc
+env/
+*wsgi.py*
+*settings.py
+*.db

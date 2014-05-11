@@ -1,0 +1,18 @@
+pip install virtualenv
+virtualenv --no-site-packages env
+source env/bin/activate
+pip install -r requirements.txt
+cd in to the directory that was created when you ran: 'django-admin.py startproject'
+    and 'ln -s ../wsgi.py wsgi.py that is for testing
+    purposes when you launch manage runserver
+
+git init
+git add .
+git commit -am "Information Here"
+git remote add origin https://github.com/AcmeProgramming/
+
+
+To run development server
+"python manage.py 0.0.0.0:555 "
+
+When restarting and pointing to another directory remember to quit the virtualenv
