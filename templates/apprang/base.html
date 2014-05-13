@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+    <head>
+        <title>Apprang - {% block title %}It is put forth that...{% endblock %}</title>
+    </head>
+
+    <body>
+    {% block body_block %}
+    {% endblock %}
+        <div>
+            {% if categories %}
+                <ul>
+                    {% for category in categories %}
+                    <li><a href="/apprang/category/{{ category.url }}">{{ category.name }}</a></li>
+                    {% endfor %}
+                 </ul>
+            {% endif %}
+
+        </div>
+            <hr />
+
+        <div>
+            <ul>
+            {% if user.is_authenticated %}
+                <li><a href="/apprang/restricted/">Restricted Page</a></li>
+                <li><a href="/apprang/logout/">Logout</a></li>
+                <li><a href="/apprang/add_category/">Add a New Category</a></li>
+            {% else %}
+                <li><a href="/apprang/register/">Register Here</a></li>
+                <li><a href="/apprang/login/">Login</a></li>
+            {% endif %}
+                <li><a href="/apprang/about/">About</a></li>
+                <li><a href="/apprang/">Home</a></li>
+            </ul>
+        </div>
+       <br><img src="{% static "corn.png" %}" alt="Picture of corn">
+    </body>
+</html>
+

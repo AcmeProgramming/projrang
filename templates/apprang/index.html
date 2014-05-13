@@ -1,25 +1,7 @@
-<!DOCTYPE html>
+{% extends 'apprang/base.html' %}
 {% load static %}
+    {% block title %}Index Haha or Index Hhmm?{% endblock %}
+{% block body_block %} 
 
-<html>
-        <head>
-            <title>Title for the index</title>
-        </head>
 
-        <body>
-            <h1>It is put forth that...</h1>
-            {% if categories %}
-                <ul>
-                    {% for category in categories %}
-                    <li><a href="/apprang/category/{{ category.url }}">{{ category.name }}</a></li>
-                    {% endfor %}
-                 </ul>
-            {% else %}
-                <strong>No categories</strong>
-            {% endif %}
-
-            <a href="/apprang/about/">About</a>
-            <a href="/apprang/add_category/">Add Category</a>
-            <img src="{% static "corn.png" %}" alt="Picture of corn">
-        </body>
-</html>
+{% endblock %}

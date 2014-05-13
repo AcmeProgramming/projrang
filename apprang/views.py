@@ -2,7 +2,10 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 from apprang.models import Category, Page
-from apprang.forms import CategoryForm, PageForm
+from apprang.forms import CategoryForm, PageForm, UserForm, UserProfileForm
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.decorators import login_required
 
 
 def decode_url(category_url_name):
@@ -152,3 +155,107 @@ def add_page(request, category_name_url):
             {'category_name_url': category_name_url,
              'category_name': category_name, 'form': form},
              context)
+
+def register(request):
+    """This def register handles registration"""
+    context = RequestContext(request)
+
+    """Boolean value for telling template whether the registration was
+       successful.  Default is false.  Value changes to True when registration
+       succeeds."""
+    registered = False
+
+    """If POST process data."""
+    if request.method == 'POST':
+        """Try to grab information from raw form.
+           Making use of both UserForm and UserProfileForm."""
+        user_form = UserForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+
+        """If both forms are valide..."""
+        if user_form.is_valid() and profile_form.is_valid():
+            """Save user_form data to database."""
+            user = user_form.save()
+
+            """Hashing password with set_password method.
+               Once hashed update user object."""
+            user.set_password(user.password)
+            user.save()
+
+            """Sort out the UserProfile.
+               Setting commit=False to delay saving model until we are
+               ready to avoid integrity problems."""
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            """If profile picture was provided
+               get it from input and put it in UserProfile model."""
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            """Now ready to save UserProfile model instance."""
+            profile.save()
+
+            """Update registered to tell template registration was successful."""
+            registered = True
+
+        else:
+            """If form is invalid or any mistakes print errors."""
+            most_errors = user_form.errors, profile_form.errors
+
+    else:
+        """If not an HTTP POST render form using two ModelForm instances."""
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    return render_to_response('apprang/register.html', {'user_form': user_form,
+                                                        'profile_form': profile_form,
+                                                        'registered': registered}, context)
+
+
+def user_login(request):
+    """This def user_login handles user logging in after registration."""
+
+    """This context holds the results from RequestContext of users request."""
+    context = RequestContext(request)
+
+    """If log in request is made, check if POST and collect username, password."""
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        """Check of password username combination is correct."""
+        user = authenticate(username=username, password=password)
+
+        """Mechanism to check if username, password combination is correct."""
+        if user:
+            """Check if account is active."""
+            if user.is_active:
+                """Process user request. Send to main page logged in."""
+                login(request, user)
+                return HttpResponseRedirect('/apprang/')
+            else:
+                """Notify that account is disabled."""
+                return HttpResponse("Your account is disabled")
+        else:
+            """If invalid log in details inform.."""
+            invalid_login_details = "Invalid login details: {0}, {1}".formate(username, password)
+            return HttpResponse("Invalid login details supplied.")
+
+    else:
+        """The request was not an HTTP POST so display login form."""
+        return render_to_response('apprang/login.html', {}, context)
+
+
+@login_required
+def restricted(request):
+    context = RequestContext(request)
+    """This def restricted restricts sections to logged in users."""
+    return render_to_response('apprang/restricted.html',{}, context)
+
+@login_required
+def user_logout(request):
+    """Using django.contrib.auth.logout to log user out."""
+    logout(request)
+    """Redirect to home page."""
+    return HttpResponseRedirect('/apprang/')
