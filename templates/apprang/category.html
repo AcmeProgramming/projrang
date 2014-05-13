@@ -11,10 +11,12 @@
         {% if category %}
             {% if pages %}
             <ul>
+                <br><br>
                 {% for page in pages %}
                 <li><a href="{{ page.url }}">{{ page.title }}</a></li>
                 {% endfor %}
             </ul>
+                <li><a href="/apprang/category/{{ category_name_url }}/add_page/">Add Page To: {{ category_name_url }} Category</a></li>
             {% else %}
                 <strong>No pages currently in category.</strong>
             {% endif %}

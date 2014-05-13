@@ -1,5 +1,6 @@
 Django==1.6.4
 Paste==1.7.5.1
+Pillow==2.4.0
 South==0.8.4
 django-debug-toolbar==1.2
 sqlparse==0.1.11
