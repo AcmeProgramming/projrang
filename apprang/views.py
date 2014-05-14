@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from apprang.models import Category, Page
 from apprang.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
+from datetime import datetime
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 
@@ -36,7 +37,27 @@ def index(request):
     """Working through category_list data to construct category.url
        for index template."""
     for category in category_list:
-        category.url = category.name.replace(' ', '_')
+        ###category.url = category.name.replace(' ', '_')
+        category.url = decode_url(category.name)
+
+    """Adding Page objects to context_dict."""
+    page_list = Page.objects.order_by('-views')[:5]
+    context_dict['pages'] = page_list
+
+    """Creating sessions."""
+    if request.session.get('last_visit'):
+        """Session has value from last visit. """
+        last_visit_time = request.session.get('last_visit')
+        visits = request.session.get('visits', 0)
+
+        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
+            request.session['visits'] = visits + 1
+            request.session['last_visit'] = str(datetime.now())
+
+    else:
+        """The get returns none and the sessions does not have a value."""
+        request.session['last_vist'] = str(datetime.now())
+        request.session['visits'] = 1
 
     """The template is in templates/apprang."""
     return render_to_response('apprang/index.html', context_dict, context)
@@ -59,8 +80,6 @@ def category(request, category_name_url):
     """The category_name holds category_name_url result after changing
         underscores to spaces.
         The category_name_url is a value passed from url."""
-    ##category_name = category_name_url.replace('_', ' ')
-    ###SVM
     category_name = decode_url(category_name_url)
 
     """The context_dict holds results from category_name"""
