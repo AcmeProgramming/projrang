@@ -21,6 +21,7 @@ def decode_url(category_url_name):
     return decoded_name
 
 
+
 def index(request):
     """The def index goes to index.html."""
 
@@ -191,7 +192,7 @@ def register(request):
         user_form = UserForm(data=request.POST)
         profile_form = UserProfileForm(data=request.POST)
 
-        """If both forms are valide..."""
+        """If both forms are valid..."""
         if user_form.is_valid() and profile_form.is_valid():
             """Save user_form data to database."""
             user = user_form.save()
@@ -258,8 +259,8 @@ def user_login(request):
                 return HttpResponse("Your account is disabled")
         else:
             """If invalid log in details inform.."""
-            invalid_login_details = "Invalid login details: {0}, {1}".formate(username, password)
-            return HttpResponse("Invalid login details supplied.")
+            invalid_login_details = render_to_response('apprang/invalid.html', {}, context)
+            return HttpResponse(invalid_login_details)
 
     else:
         """The request was not an HTTP POST so display login form."""
